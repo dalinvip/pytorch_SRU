@@ -1,0 +1,7 @@
+model snapshot\2017-10-04_09-16-12\snapshot_steps10.pt
+Evaluation - loss: 0.707709  acc: 50.0824%(912/1821) 
+model_count 1 
+
+
+The Current Best Result is : 50.0824
+
