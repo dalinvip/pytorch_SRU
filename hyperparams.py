@@ -4,6 +4,7 @@ torch.manual_seed(121)
 random.seed(121)
 
 learning_rate = 0.001
+learning_rate_decay = 0.99  # value is 1 means not change lr
 epochs = 500
 batch_size = 16
 log_interval = 1

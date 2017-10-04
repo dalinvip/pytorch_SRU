@@ -28,22 +28,24 @@ def train(train_iter, dev_iter, test_iter, model, args):
 
     '''
         lambda1 = lambda epoch: epoch // 30
-        lambda2 = lambda epoch: 0.99 ** epoch
+        # lambda2 = lambda epoch: 0.99 ** epoch
         print("lambda1 {} lambda2 {} ".format(lambda1, lambda2))
         scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=[lambda2])
     
         scheduler = lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9)
     '''
-    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
+    # scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
 
+    lambda2 = lambda epoch: args.learning_rate_decay ** epoch
+    scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=[lambda2])
     steps = 0
     model_count = 0
     model.train()
     for epoch in range(1, args.epochs+1):
         print("\n## 第{} 轮迭代，共计迭代 {} 次 ！##\n".format(epoch, args.epochs))
-        # scheduler.step()
+        scheduler.step()
         # print("now lr is {} \n".format(scheduler.get_lr()))
-        # print("now lr is {} \n".format(optimizer.param_groups[0].get("lr")))
+        print("now lr is {} \n".format(optimizer.param_groups[0].get("lr")))
         for batch in train_iter:
             feature, target = batch.text, batch.label
             # feature.data.t_()
@@ -91,8 +93,6 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 test_model = torch.load(save_path)
                 model_count += 1
                 test_eval(test_iter, test_model, save_path, args, model_count)
-                # test_eval(test_iter, model, save_path, args, model_count)
-                # print("model_count \n", model_count)
     return model_count
 
 
