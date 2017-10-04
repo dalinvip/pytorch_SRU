@@ -7,8 +7,8 @@ learning_rate = 0.001
 epochs = 500
 batch_size = 16
 log_interval = 1
-test_interval = 10
-save_interval = 10
+test_interval = 100
+save_interval = 100
 save_dir = "snapshot"
 datafile_path = "./data/"
 name_trainfile = "raw.clean.train"
@@ -31,7 +31,8 @@ static = False
 # model
 CNN = False
 BiLSTM_1 = False
-SRU = True
+SRU = False
+BiSRU = True
 # select optim algorhtim to train
 Adam = True
 SGD = False

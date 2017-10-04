@@ -13,6 +13,7 @@ import train_ALL_SRU
 from models import model_CNN
 from models import model_BiLSTM_1
 from models import model_SRU
+from models import model_BiSRU
 import multiprocessing as mu
 import shutil
 import random
@@ -70,6 +71,7 @@ parser.add_argument('-static', action='store_true', default=hyperparams.static, 
 parser.add_argument('-CNN', action='store_true', default=hyperparams.CNN, help='whether to use CNN model')
 parser.add_argument('-BiLSTM_1', action='store_true', default=hyperparams.BiLSTM_1, help='whether to use BiLSTM_1 model')
 parser.add_argument('-SRU', action='store_true', default=hyperparams.SRU, help='whether to use SRU model')
+parser.add_argument('-BiSRU', action='store_true', default=hyperparams.BiSRU, help='whether to use BiSRU model')
 parser.add_argument('-wide_conv', action='store_true', default=hyperparams.wide_conv, help='whether to use wide conv')
 parser.add_argument('-word_Embedding', action='store_true', default=hyperparams.word_Embedding, help='whether to load word embedding')
 parser.add_argument('-word_Embedding_Path', type=str, default=hyperparams.word_Embedding_Path, help='filename of model snapshot [default: None]')
@@ -179,6 +181,11 @@ elif args.SRU is True:
     model = model_SRU.SRU(args)
     # save model in this time
     shutil.copy("./models/model_SRU.py", "./snapshot/" + mulu)
+elif args.BiSRU is True:
+    print("loading  model.....")
+    model = model_BiSRU.BiSRU(args)
+    # save model in this time
+    shutil.copy("./models/model_BiSRU.py", "./snapshot/" + mulu)
 
 if args.cuda is True:
     print("using cuda......")
@@ -199,6 +206,9 @@ elif args.BiLSTM_1 is True:
     model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
 elif args.SRU is True:
     print("SRU training start......")
+    model_count = train_ALL_SRU.train(train_iter, dev_iter, test_iter, model, args)
+elif args.BiSRU is True:
+    print("BiSRU training start......")
     model_count = train_ALL_SRU.train(train_iter, dev_iter, test_iter, model, args)
 print("Model_count", model_count)
 
