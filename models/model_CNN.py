@@ -50,7 +50,7 @@ class  CNN_Text(nn.Module):
         if args.init_weight:
             print("Initing W .......")
             for conv in self.convs1:
-                init.xavier_normal(conv.weight.data, gain=np.sqrt(args.init_weight_value))
+                init.xavier_uniform(conv.weight.data, gain=np.sqrt(args.init_weight_value))
                 fan_in, fan_out = CNN_Text.calculate_fan_in_and_fan_out(conv.weight.data)
                 print(" in {} out {} ".format(fan_in, fan_out))
                 std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
