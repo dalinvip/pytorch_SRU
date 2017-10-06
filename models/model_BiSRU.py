@@ -22,7 +22,13 @@ class BiSRU(nn.Module):
         C = args.class_num
         self.dropout = nn.Dropout(args.dropout)
         self.dropout_embed = nn.Dropout(args.dropout_embed)
-        self.embed = nn.Embedding(V, D)
+        if args.max_norm is not None:
+            print("max_norm = {} ".format(args.max_norm))
+            self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
+        else:
+            print("max_norm = {} |||||".format(args.max_norm))
+            self.embed = nn.Embedding(V, D)
+        # self.embed = nn.Embedding(V, D)
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
