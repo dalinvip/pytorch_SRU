@@ -4,7 +4,8 @@ torch.manual_seed(121)
 random.seed(121)
 
 learning_rate = 0.001
-learning_rate_decay = 0.99  # value is 1 means not change lr
+learning_rate_decay = 0.9   # value is 1 means not change lr
+# learning_rate_decay = 1   # value is 1 means not change lr
 epochs = 500
 batch_size = 16
 log_interval = 1
@@ -21,10 +22,10 @@ shuffle = True
 epochs_shuffle = True
 FIVE_CLASS_TASK = False
 TWO_CLASS_TASK = True
-dropout = 0.6
+dropout = 6
 dropout_embed = 0.6
-max_norm = 5
-clip_max_norm = 3
+max_norm = None
+clip_max_norm = 5
 kernel_num = 200
 kernel_sizes = "1,2,3,4"
 # kernel_sizes = "5"
@@ -50,9 +51,9 @@ embed_dim = 300
 word_Embedding_Path = "./word2vec/glove.840B.300d.handledword2vec.txt"
 # word_Embedding_Path = "./word.txt"
 lstm_hidden_dim = 300
-lstm_num_layers = 1
+lstm_num_layers = 5
 device = 0
-no_cuda = True
+no_cuda = False
 snapshot = None
 predict = None
 test = False
@@ -62,7 +63,7 @@ freq_1_unk = False
 init_weight = True
 init_weight_value = 2.0
 # L2 weight_decay
-weight_decay = 1e-8   # default value is zero in Adam SGD
+weight_decay = 1e-9   # default value is zero in Adam SGD
 # weight_decay = 0   # default value is zero in Adam SGD
 # random seed
 seed_num = 233

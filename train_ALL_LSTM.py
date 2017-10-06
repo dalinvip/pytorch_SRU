@@ -34,16 +34,17 @@ def train(train_iter, dev_iter, test_iter, model, args):
     
         scheduler = lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9)
     '''
-    scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
-
+    # scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
+    lambda2 = lambda epoch: args.learning_rate_decay ** epoch
+    scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=[lambda2])
     steps = 0
     model_count = 0
     model.train()
     for epoch in range(1, args.epochs+1):
         print("\n## 第{} 轮迭代，共计迭代 {} 次 ！##\n".format(epoch, args.epochs))
-        # scheduler.step()
+        scheduler.step()
         # print("now lr is {} \n".format(scheduler.get_lr()))
-        # print("now lr is {} \n".format(optimizer.param_groups[0].get("lr")))
+        print("now lr is {} \n".format(optimizer.param_groups[0].get("lr")))
         for batch in train_iter:
             feature, target = batch.text, batch.label
             # feature.data.t_()

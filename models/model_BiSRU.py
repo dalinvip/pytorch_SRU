@@ -33,6 +33,8 @@ class BiSRU(nn.Module):
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
 
+        # self.bisru = MF.SRU(input_size=D, hidden_size=self.hidden_dim, num_layers=self.num_layers,
+        #                     dropout=self.args.dropout, rnn_dropout=self.dropout, bidirectional=True)
         self.bisru = MF.SRU(input_size=D, hidden_size=self.hidden_dim, num_layers=self.num_layers,
                             dropout=self.args.dropout, bidirectional=True)
         print(self.bisru)

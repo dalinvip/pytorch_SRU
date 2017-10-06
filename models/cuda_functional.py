@@ -8,6 +8,7 @@ from torch.autograd import Function, Variable
 from cupy.cuda import function
 from pynvrtc.compiler import Program
 from collections import namedtuple
+import torch.nn.init as init
 
 
 tmp_ = torch.rand(1,1).cuda()
@@ -462,7 +463,10 @@ class SRUCell(nn.Module):
 
     def init_weight(self):
         val_range = (3.0/self.n_in)**0.5
+        # source code
         self.weight.data.uniform_(-val_range, val_range)
+        # my modify code
+        # init.xavier_uniform(self.weight, gain=val_range)
         self.bias.data.zero_()
 
     def set_bias(self, bias_val=0):

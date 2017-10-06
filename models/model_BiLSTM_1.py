@@ -46,9 +46,12 @@ class BiLSTM_1(nn.Module):
     def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
         # the second is the cell  c
-        return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
-                Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
-
+        if self.args.cuda is True:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda(),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)).cuda())
+        else:
+            return (Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)),
+                    Variable(torch.zeros(2 * num_layers, batch_size, self.hidden_dim)))
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout_embed(x)
