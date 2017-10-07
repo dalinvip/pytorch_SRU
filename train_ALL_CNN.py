@@ -52,7 +52,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
         for batch in train_iter:
             feature, target = batch.text, batch.label
             feature.data.t_(), target.data.sub_(1)  # batch first, index align
-            if args.cuda:
+            if args.cuda is True:
                 feature, target = feature.cuda(), target.cuda()
             optimizer.zero_grad()
             logit = model(feature)
@@ -62,8 +62,6 @@ def train(train_iter, dev_iter, test_iter, model, args):
             if args.init_clip_max_norm is not None:
                 utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
             optimizer.step()
-
-
             steps += 1
             if steps % args.log_interval == 0:
                 train_size = len(train_iter.dataset)

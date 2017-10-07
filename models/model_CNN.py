@@ -37,11 +37,19 @@ class  CNN_Text(nn.Module):
 
         if args.wide_conv is True:
             print("using wide convolution")
-            self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1),
-                                     padding=(K//2, 0), dilation=1, bias=False) for K in Ks]
+            if self.args.cuda is True:
+                self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1),
+                                         padding=(K//2, 0), dilation=1, bias=False).cuda() for K in Ks]
+            else:
+                self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1),
+                                         padding=(K // 2, 0), dilation=1, bias=False) for K in Ks]
         else:
             print("using narrow convolution")
-            self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True) for K in Ks]
+            if self.args.cuda is True:
+                self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True).cuda() for K in Ks]
+            else:
+                self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), bias=True) for K in
+                               Ks]
         # self.convs1 = [nn.Conv2d(Ci, D, (K, D), stride=1, padding=(K // 2, 0)) for K in Ks]
         print(self.convs1)
 
@@ -51,16 +59,19 @@ class  CNN_Text(nn.Module):
             print("Initing W .......")
             for conv in self.convs1:
                 init.xavier_uniform(conv.weight.data, gain=np.sqrt(args.init_weight_value))
-                fan_in, fan_out = CNN_Text.calculate_fan_in_and_fan_out(conv.weight.data)
-                print(" in {} out {} ".format(fan_in, fan_out))
-                std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
-                print("aaaaaaaaaaaaa {} ".format(std))
+                # fan_in, fan_out = CNN_Text.calculate_fan_in_and_fan_out(conv.weight.data)
+                # print(" in {} out {} ".format(fan_in, fan_out))
+                # std = np.sqrt(args.init_weight_value) * np.sqrt(2.0 / (fan_in + fan_out))
+                # print("aaaaaaaaaaaaa {} ".format(std))
                 # init.uniform(conv.bias, 0, 0)
 
         self.dropout = nn.Dropout(args.dropout)
         self.dropout_embed = nn.Dropout(args.dropout_embed)
         in_fea = len(Ks) * Co
-        self.fc = nn.Linear(in_features=in_fea, out_features=C, bias=True)
+        if self.args.cuda is True:
+            self.fc = nn.Linear(in_features=in_fea, out_features=C, bias=True).cuda()
+        else:
+            self.fc = nn.Linear(in_features=in_fea, out_features=C, bias=True)
         # whether to use batch normalizations
 
     def calculate_fan_in_and_fan_out(tensor):
