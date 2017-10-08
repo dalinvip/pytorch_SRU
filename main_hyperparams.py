@@ -5,6 +5,7 @@ import datetime
 import torch
 import torchtext.data as data
 from loaddata import mydatasets_self_two
+from loaddata import loadingdata_Twitter
 from loaddata.load_external_word_embedding import Word_Embedding
 import train_ALL_CNN
 import train_ALL_LSTM
@@ -49,11 +50,7 @@ parser.add_argument('-Twitter', action="store_true", default=hyperparams.Twitter
 parser.add_argument('-MR', action="store_true", default=hyperparams.MR, help='load MR data')
 parser.add_argument('-CR', action="store_true", default=hyperparams.CR, help='load CR data')
 parser.add_argument('-Subj', action="store_true", default=hyperparams.Subj, help='load Subj data')
-# data
-parser.add_argument('-datafile_path', type=str, default=hyperparams.datafile_path, help='datafile path')
-parser.add_argument('-name_trainfile', type=str, default=hyperparams.name_trainfile, help='train file name')
-parser.add_argument('-name_devfile', type=str, default=hyperparams.name_devfile, help='dev file name')
-parser.add_argument('-name_testfile', type=str, default=hyperparams.name_testfile, help='test file name')
+# shuffle data
 parser.add_argument('-shuffle', action='store_true', default=hyperparams.shuffle, help='shuffle the data every epoch' )
 parser.add_argument('-epochs_shuffle', action='store_true', default=hyperparams.epochs_shuffle, help='shuffle the data every epoch' )
 # task select
@@ -63,7 +60,6 @@ parser.add_argument('-Adam', action='store_true', default=hyperparams.Adam, help
 parser.add_argument('-SGD', action='store_true', default=hyperparams.SGD, help='whether to select SGD to train')
 parser.add_argument('-Adadelta', action='store_true', default=hyperparams.Adadelta, help='whether to select Adadelta to train')
 # model
-parser.add_argument('-char_data', action='store_true', default=hyperparams.char_data, help='whether to use ')
 parser.add_argument('-rm_model', action='store_true', default=hyperparams.rm_model, help='whether to delete the model after test acc so that to save space')
 parser.add_argument('-init_weight', action='store_true', default=hyperparams.init_weight, help='init w')
 parser.add_argument('-init_weight_value', type=float, default=hyperparams.init_weight_value, help='value of init w')
@@ -98,9 +94,8 @@ args = parser.parse_args()
 
 
 # load two-classification data
-def mrs_two(path, train_name, dev_name, test_name, char_data, text_field, label_field, **kargs):
-    train_data, dev_data, test_data = mydatasets_self_two.MR.splits(path, train_name, dev_name, test_name,
-                                                                    char_data, text_field, label_field)
+def load_data(path,text_field, label_field, **kargs):
+    train_data, dev_data, test_data = loadingdata_Twitter.MR.splits(path, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data.text, min_freq=args.min_freq)
     label_field.build_vocab(train_data.label)
@@ -116,9 +111,21 @@ label_field = data.Field(sequential=False)
 print("\nLoading data...")
 if args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
-    train_iter, dev_iter, test_iter = mrs_two(args.datafile_path, args.name_trainfile,
-                                              args.name_devfile, args.name_testfile, args.char_data, text_field,
-                                              label_field, device=-1, repeat=False, shuffle=args.epochs_shuffle)
+    # which data to load
+    data_path = None
+    if args.MR is True:
+        print("loading MR data")
+        data_path = args.MR_path
+    elif args.CR is True:
+        print("loading CR data")
+        data_path = args.CR_path
+    elif args.Subj is True:
+        print("loading Subj data")
+        data_path = args.Subj_path
+    elif args.Twitter is True:
+        print("loading Twitter data")
+        data_path = args.Twitter_path
+    train_iter, dev_iter, test_iter = load_data(data_path, text_field, label_field, device=args.device, repeat=False, shuffle=args.epochs_shuffle)
 
     '''
     # handle external word embedding to file for convenience

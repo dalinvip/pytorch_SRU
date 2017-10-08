@@ -10,7 +10,7 @@ random.seed(hyperparams.seed_num)
 
 class MR(data.Dataset):
 
-    def __init__(self, text_field, label_field, path=None, file=None, examples=None, char_data=None, **kwargs):
+    def __init__(self, text_field, label_field, path=None, file=None, examples=None, **kwargs):
         """
         Arguments:
             text_field: The field that will be used for text data.
@@ -51,9 +51,9 @@ class MR(data.Dataset):
                 a, b = 0, 0
                 for line in f.readlines():
                     sentence, flag = line.strip().split(' ||| ')
-                    if char_data is True:
-                        sentence = sentence.split(" ")
-                        sentence = MR.char_data(self, sentence)
+                    # if char_data is True:
+                    #     sentence = sentence.split(" ")
+                    #     sentence = MR.char_data(self, sentence)
                     # print(sentence)
                     # clear string in every sentence
                     sentence = clean_str(sentence)
@@ -72,15 +72,8 @@ class MR(data.Dataset):
                 print("a {} b {} ".format(a, b))
         super(MR, self).__init__(examples, fields, **kwargs)
 
-    def char_data(self, list):
-        data = []
-        for i in range(len(list)):
-            for j in range(len(list[i])):
-                data += list[i][j]
-        return data
-
     @classmethod
-    def splits(cls, path, train, dev, test, char_data, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
+    def splits(cls, path, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
         """Create dataset objects for splits of the MR dataset.
         Arguments:
             text_field: The field that will be used for the sentence.
@@ -94,12 +87,13 @@ class MR(data.Dataset):
             Remaining keyword arguments: Passed to the splits method of
                 Dataset.
         """
-        print(path + train)
-        print(path + dev)
-        print(path + test)
-        examples_train = cls(text_field, label_field, path=path, file=train, char_data=char_data, **kwargs).examples
-        examples_dev = cls(text_field, label_field, path=path, file=dev, char_data=char_data, **kwargs).examples
-        examples_test = cls(text_field, label_field, path=path, file=test, char_data=char_data, **kwargs).examples
+        print(path)
+        train = "raw.clean.train"
+        dev = "raw.clean.dev"
+        test = "raw.clean.test"
+        examples_train = cls(text_field, label_field, path=path, file=train, **kwargs).examples
+        examples_dev = cls(text_field, label_field, path=path, file=dev, **kwargs).examples
+        examples_test = cls(text_field, label_field, path=path, file=test, **kwargs).examples
         if shuffle:
             print("shuffle data examples......")
             random.shuffle(examples_train)
