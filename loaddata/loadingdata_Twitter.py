@@ -8,7 +8,7 @@ torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
 
-class MR(data.Dataset):
+class Twitter(data.Dataset):
 
     def __init__(self, text_field, label_field, path=None, file=None, examples=None, **kwargs):
         """
@@ -70,7 +70,7 @@ class MR(data.Dataset):
                         b += 1
                         examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
                 print("a {} b {} ".format(a, b))
-        super(MR, self).__init__(examples, fields, **kwargs)
+        super(Twitter, self).__init__(examples, fields, **kwargs)
 
     @classmethod
     def splits(cls, path, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
