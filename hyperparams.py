@@ -3,6 +3,19 @@ import random
 torch.manual_seed(121)
 random.seed(121)
 
+
+# data path
+Twitter_path = "./data/Twitter"
+MR_path = "./data/MR"
+CR_path = "./data/CR"
+Subj_path = "./data/Subj"
+
+# select which data
+Twitter = True
+MR = False
+CR = False
+Subj = False
+
 learning_rate = 0.001
 learning_rate_decay = 0.9   # value is 1 means not change lr
 # learning_rate_decay = 1   # value is 1 means not change lr

@@ -4,7 +4,6 @@ import argparse
 import datetime
 import torch
 import torchtext.data as data
-from loaddata import mydatasets_self_five
 from loaddata import mydatasets_self_two
 from loaddata.load_external_word_embedding import Word_Embedding
 import train_ALL_CNN
@@ -40,6 +39,16 @@ parser.add_argument('-log-interval',  type=int, default=hyperparams.log_interval
 parser.add_argument('-test-interval', type=int, default=hyperparams.test_interval, help='how many steps to wait before testing [default: 100]')
 parser.add_argument('-save-interval', type=int, default=hyperparams.save_interval, help='how many steps to wait before saving [default:500]')
 parser.add_argument('-save-dir', type=str, default=hyperparams.save_dir, help='where to save the snapshot')
+# data path
+parser.add_argument('-Twitter_path', type=str, default=hyperparams.Twitter_path, help='Twitter data path')
+parser.add_argument('-MR_path', type=str, default=hyperparams.MR_path, help='MR data path')
+parser.add_argument('-CR_path', type=str, default=hyperparams.CR_path, help='CR data path')
+parser.add_argument('-Subj_path', type=str, default=hyperparams.Subj_path, help='Subj data path')
+# which data to load
+parser.add_argument('-Twitter', action="store_true", default=hyperparams.Twitter, help='load Twitter data')
+parser.add_argument('-MR', action="store_true", default=hyperparams.MR, help='load MR data')
+parser.add_argument('-CR', action="store_true", default=hyperparams.CR, help='load CR data')
+parser.add_argument('-Subj', action="store_true", default=hyperparams.Subj, help='load Subj data')
 # data
 parser.add_argument('-datafile_path', type=str, default=hyperparams.datafile_path, help='datafile path')
 parser.add_argument('-name_trainfile', type=str, default=hyperparams.name_trainfile, help='train file name')
@@ -134,8 +143,6 @@ if args.word_Embedding:
     word_vecs = word_embedding.add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
     print("len(word_vecs) {} ".format(len(word_vecs)))
     print("unknown word2vec loaded ! and converted to list...")
-
-
 
 # update args and print
 args.embed_num = len(text_field.vocab)
