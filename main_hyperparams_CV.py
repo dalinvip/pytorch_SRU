@@ -108,12 +108,14 @@ def load_data_twitter(path,text_field, label_field, **kargs):
 
 
 # load data that need CV
-def load_data(path,text_field, label_field, **kargs):
-    train_data = loadingdata_MR.MR.splits(path, text_field, label_field)
+def load_cv_data(text_field, label_field, path, **kargs):
+    train_data, dev_data, test_data = loadingdata_MR.MR.splits(path, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data.text, min_freq=args.min_freq)
     label_field.build_vocab(train_data.label)
-    return train_data
+    train_iter, dev_iter, test_iter = create_Iterator(train_data, dev_data, test_data, batch_size=args.batch_size,
+                                                      **kargs)
+    return train_iter, dev_iter, test_iter
 
 
 # create Iterator
@@ -132,10 +134,10 @@ def create_Iterator(train_data, dev_data, test_data, batch_size, **kargs):
 #     print("cv")
 #     return None, None, None
 #
-
+# cross CV
 def cv_spilit_file(path, nfold, test_id):
     assert (nfold > 1) and (test_id >= 0) and (test_id < nfold)
-    print("ddddddddd")
+    print("CV file......")
     if os.path.exists("./temp_train.txt"):
         os.remove("./temp_train.txt")
     if os.path.exists("./temp_test.txt"):
@@ -158,14 +160,18 @@ if args.TWO_CLASS_TASK:
     print("Executing 2 Classification Task......")
     # which data to load
     data_path = None
-    if args.Twitter is True:
-        print("loading Twitter data")
-        data_path = args.Twitter_path
-        train_iter, dev_iter, test_iter = load_data_twitter(data_path, text_field, label_field, device=args.device,
-                                                            repeat=False, shuffle=args.epochs_shuffle)
-    else:
-        print("The dataset require CV, please execute the main_hyperparams_CV.py file")
-        exit()
+    if args.MR is True:
+        print("loading MR data")
+        data_path = args.MR_path + "/rt-polarity.all"
+        cv_spilit_file(data_path, args.nfold, test_id=0)
+        train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
+                                                       repeat=False, shuffle=args.epochs_shuffle)
+    elif args.CR is True:
+        print("loading CR data")
+        data_path = args.CR_path
+    elif args.Subj is True:
+        print("loading Subj data")
+        data_path = args.Subj_path
 
     '''
     # handle external word embedding to file for convenience

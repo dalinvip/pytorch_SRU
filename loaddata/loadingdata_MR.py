@@ -4,11 +4,17 @@ from torchtext import data
 import random
 import torch
 import hyperparams
+from imp import reload
+import sys
+defaultencoding = 'utf-8'
+if sys.getdefaultencoding() != defaultencoding:
+    reload(sys)
+    sys.setdefaultencoding(defaultencoding)
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
 
-class Twitter(data.Dataset):
+class MR(data.Dataset):
 
     def __init__(self, text_field, label_field, path=None, file=None, examples=None, **kwargs):
         """
@@ -47,26 +53,22 @@ class Twitter(data.Dataset):
         if examples is None:
             path = None if os.path.join(path, file) is None else os.path.join(path, file)
             examples = []
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 a, b = 0, 0
-                for line in f.readlines():
-                    sentence, flag = line.strip().split(' ||| ')
+                for line in f:
+                    # sentence, flag = line.strip().split(' ||| ')
+                    # print(line)
+                    label, seq, sentence = line.partition(" ")
                     # clear string in every sentence
                     sentence = clean_str(sentence)
-                    if line[-2] == '0':
+                    if label == '0':
                         a += 1
                         examples += [data.Example.fromlist([sentence, 'negative'], fields=fields)]
-                    elif line[-2] == '1':
-                        a += 1
-                        examples += [data.Example.fromlist([sentence, 'negative'], fields=fields)]
-                    elif line[-2] == '3':
+                    elif label == '1':
                         b += 1
                         examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
-                    elif line[-2] == '4':
-                        b += 1
-                        examples += [data.Example.fromlist([sentence, 'positive'], fields=fields)]
-                print("a {} b {} ".format(a, b))
-        super(Twitter, self).__init__(examples, fields, **kwargs)
+                print("negative sentence a {}, positive sentence b {} ".format(a, b))
+        super(MR, self).__init__(examples, fields, **kwargs)
 
     @classmethod
     def splits(cls, path, text_field, label_field, dev_ratio=.1, shuffle=True ,root='.', **kwargs):
@@ -84,18 +86,17 @@ class Twitter(data.Dataset):
                 Dataset.
         """
         print(path)
-        train = "raw.clean.train"
-        dev = "raw.clean.dev"
-        test = "raw.clean.test"
-        examples_train = cls(text_field, label_field, path=path, file=train, **kwargs).examples
-        examples_dev = cls(text_field, label_field, path=path, file=dev, **kwargs).examples
-        examples_test = cls(text_field, label_field, path=path, file=test, **kwargs).examples
+        train_file = "temp_train.txt"
+        test_file = "temp_test.txt"
+        examples_train = cls(text_field, label_field, path=path, file=train_file, **kwargs).examples
+        examples_test = cls(text_field, label_field, path=path, file=test_file, **kwargs).examples
         if shuffle:
             print("shuffle data examples......")
             random.shuffle(examples_train)
-            random.shuffle(examples_dev)
             random.shuffle(examples_test)
+        if dev_ratio > 0:
+            dev_index = -1 * int(dev_ratio * len(examples_train))
 
-        return (cls(text_field, label_field, examples=examples_train),
-                cls(text_field, label_field, examples=examples_dev),
+        return (cls(text_field, label_field, examples=examples_train[:dev_index]),
+                cls(text_field, label_field, examples=examples_train[dev_index:]),
                 cls(text_field, label_field, examples=examples_test))

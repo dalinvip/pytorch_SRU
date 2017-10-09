@@ -11,10 +11,14 @@ CR_path = "./data/CR"
 Subj_path = "./data/Subj"
 
 # select which data
-Twitter = True
-MR = False
+Twitter = False
+MR = True
 CR = False
 Subj = False
+
+# cv
+CV = True
+nfold = 10
 
 learning_rate = 0.001
 learning_rate_decay = 0.9   # value is 1 means not change lr
@@ -51,10 +55,10 @@ wide_conv = True
 # min freq to include during built the vocab, default is 1
 min_freq = 1
 # word_Embedding
-word_Embedding = True
+word_Embedding = False
 embed_dim = 300
 # word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
-word_Embedding_Path = "./word2vec/glove.840B.300d.handledword2vec.txt"
+word_Embedding_Path = "./word2vec/glove.840B.300d.handled.Twitter.txt"
 # word_Embedding_Path = "./word.txt"
 lstm_hidden_dim = 300
 lstm_num_layers = 5
