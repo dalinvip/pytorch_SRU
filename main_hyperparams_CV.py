@@ -5,7 +5,7 @@ import datetime
 import torch
 import torchtext.data as data
 from loaddata import loadingdata_Twitter
-from loaddata import loadingdata_MR
+from loaddata import loadingdata_CV
 from loaddata.load_external_word_embedding import Word_Embedding
 import train_ALL_CNN
 import train_ALL_LSTM
@@ -109,7 +109,7 @@ def load_data_twitter(path,text_field, label_field, **kargs):
 
 # load data that need CV
 def load_cv_data(text_field, label_field, path, **kargs):
-    train_data, dev_data, test_data = loadingdata_MR.MR.splits(path, text_field, label_field)
+    train_data, dev_data, test_data = loadingdata_CV.CV.splits(path, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     print("len(dev_data) {} ".format(len(dev_data)))
     print("len(test_data) {} ".format(len(test_data)))
@@ -210,6 +210,7 @@ if not os.path.isdir(Temp_Test_Result):
 
 cv_result = []
 
+# CV loop start
 for id in range(args.nfold):
     print("\nthe {} CV file".format(id))
     if args.TWO_CLASS_TASK:
@@ -224,10 +225,16 @@ for id in range(args.nfold):
                                                            repeat=False, shuffle=args.epochs_shuffle)
         elif args.CR is True:
             print("loading CR data")
-            data_path = args.CR_path
+            data_path = args.CR_path + "/custrev.all"
+            cv_spilit_file(data_path, args.nfold, test_id=id)
+            train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
+                                                           repeat=False, shuffle=args.epochs_shuffle)
         elif args.Subj is True:
             print("loading Subj data")
-            data_path = args.Subj_path
+            data_path = args.Subj_path + "/subj.all"
+            cv_spilit_file(data_path, args.nfold, test_id=id)
+            train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
+                                                           repeat=False, shuffle=args.epochs_shuffle)
 
         '''
         # handle external word embedding to file for convenience
@@ -320,11 +327,10 @@ for id in range(args.nfold):
     # calculate the best result
     cv_result.append(calculate_result(id=id))
 
-# calculate the result of all cv
+# calculate the result and write of all cv
 print(cv_result)
 cv_mean = cal_mean(cv_result)
 print("The best result is {:.6f} ".format(cv_mean))
-# if os.path.exists("./Temp_Test_Result/Final_Result.txt")
 file = open("./Temp_Test_Result/Final_Result.txt", "a")
 for index, value in enumerate(cv_result):
     print(index)

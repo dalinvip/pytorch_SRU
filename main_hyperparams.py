@@ -5,7 +5,7 @@ import datetime
 import torch
 import torchtext.data as data
 from loaddata import loadingdata_Twitter
-from loaddata import loadingdata_MR
+from loaddata import loadingdata_CV
 from loaddata.load_external_word_embedding import Word_Embedding
 import train_ALL_CNN
 import train_ALL_LSTM
@@ -109,7 +109,7 @@ def load_data_twitter(path,text_field, label_field, **kargs):
 
 # load data that need CV
 def load_data(path,text_field, label_field, **kargs):
-    train_data = loadingdata_MR.MR.splits(path, text_field, label_field)
+    train_data = loadingdata_CV.MR.splits(path, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
     text_field.build_vocab(train_data.text, min_freq=args.min_freq)
     label_field.build_vocab(train_data.label)
