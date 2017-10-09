@@ -155,7 +155,7 @@ def cv_spilit_file(path, nfold, test_id):
     file_test.close()
 
 
-def calculate_result():
+def calculate_result(id):
     resultlist = []
     if os.path.exists("./Test_Result.txt"):
         file = open("./Test_Result.txt")
@@ -169,6 +169,7 @@ def calculate_result():
         file.write("\n")
         file.close()
         shutil.copy("./Test_Result.txt", "./snapshot/" + mulu)
+        shutil.copy("./Test_Result.txt", "./Temp_Test_Result/Test_Result_" + str(id) + ".txt")
     best_result = result[len(result) - 1]
     return best_result
 
@@ -200,12 +201,17 @@ if os.path.exists("./Parameters.txt"):
 
 print("\n cpu_count \n", mu.cpu_count())
 torch.set_num_threads(args.num_threads)
-if os.path.exists("./Test_Result.txt"):
-    os.remove("./Test_Result.txt")
+
+Temp_Test_Result = "./Temp_Test_Result"
+if os.path.exists(Temp_Test_Result):
+    shutil.rmtree(Temp_Test_Result)
+if not os.path.isdir(Temp_Test_Result):
+    os.makedirs(Temp_Test_Result)
 
 cv_result = []
 
 for id in range(args.nfold):
+    print("\nthe {} CV file".format(id))
     if args.TWO_CLASS_TASK:
         print("Executing 2 Classification Task......")
         # which data to load
@@ -258,12 +264,12 @@ for id in range(args.nfold):
     # print parameters
     print("\nParameters:")
     file = open("Parameters.txt", "a")
+    file.write("\n**********   The CV = {} Parameters   **********\n".format(id))
     for attr, value in sorted(args.__dict__.items()):
         if attr.upper() != "PRETRAINED_WEIGHT" and attr.upper() != "pretrained_weight_static".upper():
             print("\t{}={}".format(attr.upper(), value))
         file.write("\t{}={}\n".format(attr.upper(), value))
     file.close()
-    # shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
     shutil.copy("./Parameters.txt", "./snapshot/" + mulu)
     shutil.copy("./hyperparams.py", "./snapshot/" + mulu)
 
@@ -294,6 +300,9 @@ for id in range(args.nfold):
         model = model.cuda()
     print(model)
 
+    if os.path.exists("./Test_Result.txt"):
+        os.remove("./Test_Result.txt")
+
     if args.CNN is True:
         print("CNN training start......")
         model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
@@ -309,8 +318,21 @@ for id in range(args.nfold):
     print("Model_count", model_count)
 
     # calculate the best result
-    cv_result.append(calculate_result())
+    cv_result.append(calculate_result(id=id))
+
+# calculate the result of all cv
 print(cv_result)
 cv_mean = cal_mean(cv_result)
 print("The best result is {:.6f} ".format(cv_mean))
+# if os.path.exists("./Temp_Test_Result/Final_Result.txt")
+file = open("./Temp_Test_Result/Final_Result.txt", "a")
+for index, value in enumerate(cv_result):
+    print(index)
+    stra = str(index + 1) + "   " + str(value)
+    file.write(stra)
+    file.write("\n")
+file.write("mean_value  " + str(cv_mean))
+file.close()
+shutil.copytree("./Temp_Test_Result/", "./snapshot/" + mulu + "/Temp_Test_Result")
+
 

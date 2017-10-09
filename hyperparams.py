@@ -18,7 +18,7 @@ Subj = False
 
 # cv
 CV = True
-nfold = 5
+nfold = 2
 
 learning_rate = 0.001
 learning_rate_decay = 0.9   # value is 1 means not change lr

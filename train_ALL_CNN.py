@@ -162,7 +162,8 @@ def test_eval(data_iter, model, save_path, args, model_count):
         file.write("\nThe Current Best Result is : " + str(result[len(result) - 1]))
         file.write("\n\n")
         file.close()
-    shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
+    # shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu + "/Test_Result.txt")
+    shutil.copy("./Test_Result.txt", "./snapshot/" + args.mulu)
     # whether to delete the model after test acc so that to save space
     if os.path.isfile(save_path) and args.rm_model is True:
         os.remove(save_path)
