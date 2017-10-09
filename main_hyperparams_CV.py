@@ -111,6 +111,8 @@ def load_data_twitter(path,text_field, label_field, **kargs):
 def load_cv_data(text_field, label_field, path, **kargs):
     train_data, dev_data, test_data = loadingdata_MR.MR.splits(path, text_field, label_field)
     print("len(train_data) {} ".format(len(train_data)))
+    print("len(dev_data) {} ".format(len(dev_data)))
+    print("len(test_data) {} ".format(len(test_data)))
     text_field.build_vocab(train_data.text, min_freq=args.min_freq)
     label_field.build_vocab(train_data.label)
     train_iter, dev_iter, test_iter = create_Iterator(train_data, dev_data, test_data, batch_size=args.batch_size,
@@ -147,60 +149,44 @@ def cv_spilit_file(path, nfold, test_id):
     with open(path, encoding="utf-8") as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
-            print(i, line)
+            # print(i, line)
             file_train.writelines(line) if i % nfold != test_id else file_test.writelines(line)
     file_train.close()
     file_test.close()
+
+
+def calculate_result():
+    resultlist = []
+    if os.path.exists("./Test_Result.txt"):
+        file = open("./Test_Result.txt")
+        for line in file.readlines():
+            if line[:10] == "Evaluation":
+                resultlist.append(float(line[34:41]))
+        result = sorted(resultlist)
+        file.close()
+        file = open("./Test_Result.txt", "a")
+        file.write("\nThe Best Result is : " + str(result[len(result) - 1]))
+        file.write("\n")
+        file.close()
+        shutil.copy("./Test_Result.txt", "./snapshot/" + mulu)
+    best_result = result[len(result) - 1]
+    return best_result
+
+
+# calculate the all cv means
+def cal_mean(list):
+    sum = 0
+    for i in list:
+        sum += i
+    avg = sum / len(list)
+    return avg
+
 
 # load data
 text_field = data.Field(lower=True)
 label_field = data.Field(sequential=False)
 print("\nLoading data...")
-if args.TWO_CLASS_TASK:
-    print("Executing 2 Classification Task......")
-    # which data to load
-    data_path = None
-    if args.MR is True:
-        print("loading MR data")
-        data_path = args.MR_path + "/rt-polarity.all"
-        cv_spilit_file(data_path, args.nfold, test_id=0)
-        train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
-                                                       repeat=False, shuffle=args.epochs_shuffle)
-    elif args.CR is True:
-        print("loading CR data")
-        data_path = args.CR_path
-    elif args.Subj is True:
-        print("loading Subj data")
-        data_path = args.Subj_path
-
-    '''
-    # handle external word embedding to file for convenience
-    from loaddata.handle_wordEmbedding2File import WordEmbedding2File
-    wordembedding = WordEmbedding2File(wordEmbedding_path="./word2vec/glove.sentiment.conj.pretrained.txt",
-                                       vocab=text_field.vocab.itos, k_dim=300)
-    wordembedding.handle()
-    '''
-# load word2vec
-if args.word_Embedding:
-    word_embedding = Word_Embedding()
-    if args.embed_dim is not None:
-        print("word_Embedding_Path {} ".format(args.word_Embedding_Path))
-        path = args.word_Embedding_Path
-    print("loading word2vec vectors...")
-    word_vecs = word_embedding.load_my_vecs(path, text_field.vocab.itos, text_field.vocab.freqs, k=args.embed_dim)
-    print("word2vec loaded!")
-    print("num words already in word2vec: " + str(len(word_vecs)))
-    print("loading unknown word2vec and convert to list...")
-    print("loading unknown word by avg......")
-    # word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
-    word_vecs = word_embedding.add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
-    print("len(word_vecs) {} ".format(len(word_vecs)))
-    print("unknown word2vec loaded ! and converted to list...")
-
-# update args and print
-args.embed_num = len(text_field.vocab)
-args.class_num = len(label_field.vocab) - 1
-args.cuda = (args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
+args.cuda = (args.no_cuda) and torch.cuda.is_available()
 args.kernel_sizes = [int(k) for k in args.kernel_sizes.split(',')]
 # save file
 mulu = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -209,87 +195,122 @@ args.save_dir = os.path.join(args.save_dir, mulu)
 if not os.path.isdir(args.save_dir):
     os.makedirs(args.save_dir)
 
-# load word2vec
-if args.word_Embedding:
-    args.pretrained_weight = word_vecs
-
-# print parameters
-print("\nParameters:")
 if os.path.exists("./Parameters.txt"):
     os.remove("./Parameters.txt")
-file = open("Parameters.txt", "a")
-for attr, value in sorted(args.__dict__.items()):
-    if attr.upper() != "PRETRAINED_WEIGHT" and attr.upper() != "pretrained_weight_static".upper():
-        print("\t{}={}".format(attr.upper(), value))
-    file.write("\t{}={}\n".format(attr.upper(), value))
-file.close()
-shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
-shutil.copy("./hyperparams.py", "./snapshot/" + mulu)
 
-# model
-if args.CNN is True:
-    print("loading CNN model.....")
-    model = model_CNN.CNN_Text(args)
-    # save model in this time
-    shutil.copy("./models/model_CNN.py", "./snapshot/" + mulu)
-elif args.BiLSTM_1 is True:
-    print("loading BiLSTM_1 model.....")
-    model = model_BiLSTM_1.BiLSTM_1(args)
-    # save model in this time
-    shutil.copy("./models/model_BiLSTM_1.py", "./snapshot/" + mulu)
-elif args.SRU is True:
-    print("loading SRU model.....")
-    model = model_SRU.SRU(args)
-    # save model in this time
-    shutil.copy("./models/model_SRU.py", "./snapshot/" + mulu)
-elif args.BiSRU is True:
-    print("loading  model.....")
-    model = model_BiSRU.BiSRU(args)
-    # save model in this time
-    shutil.copy("./models/model_BiSRU.py", "./snapshot/" + mulu)
-
-if args.cuda is True:
-    print("using cuda......")
-    model = model.cuda()
-print(model)
-        
-
-# train
 print("\n cpu_count \n", mu.cpu_count())
 torch.set_num_threads(args.num_threads)
 if os.path.exists("./Test_Result.txt"):
     os.remove("./Test_Result.txt")
 
-# for id in range(args.nfold):
-#     cv_spilit_file(data_path, args.nfold, test_id=id)
-#     train_iter, dev_iter, test_iter = load_data_twitter(data_path, text_field, label_field, device=args.device,
-#                                                         repeat=False, shuffle=args.epochs_shuffle)
-# cv_spilit_file(data_path, args.nfold, test_id=1)
+cv_result = []
 
-if args.CNN is True:
-    print("CNN training start......")
-    model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
-elif args.BiLSTM_1 is True:
-    print("BiLSTM_1 training start......")
-    model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
-elif args.SRU is True:
-    print("SRU training start......")
-    model_count = train_ALL_SRU.train(train_iter, dev_iter, test_iter, model, args)
-elif args.BiSRU is True:
-    print("BiSRU training start......")
-    model_count = train_ALL_SRU.train(train_iter, dev_iter, test_iter, model, args)
-print("Model_count", model_count)
+for id in range(args.nfold):
+    if args.TWO_CLASS_TASK:
+        print("Executing 2 Classification Task......")
+        # which data to load
+        data_path = None
+        if args.MR is True:
+            print("loading MR data")
+            data_path = args.MR_path + "/rt-polarity.all"
+            cv_spilit_file(data_path, args.nfold, test_id=id)
+            train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
+                                                           repeat=False, shuffle=args.epochs_shuffle)
+        elif args.CR is True:
+            print("loading CR data")
+            data_path = args.CR_path
+        elif args.Subj is True:
+            print("loading Subj data")
+            data_path = args.Subj_path
 
-resultlist = []
-if os.path.exists("./Test_Result.txt"):
-    file = open("./Test_Result.txt")
-    for line in file.readlines():
-        if line[:10] == "Evaluation":
-            resultlist.append(float(line[34:41]))
-    result = sorted(resultlist)
+        '''
+        # handle external word embedding to file for convenience
+        from loaddata.handle_wordEmbedding2File import WordEmbedding2File
+        wordembedding = WordEmbedding2File(wordEmbedding_path="./word2vec/glove.sentiment.conj.pretrained.txt",
+                                           vocab=text_field.vocab.itos, k_dim=300)
+        wordembedding.handle()
+        '''
+    # load word2vec
+    if args.word_Embedding:
+        word_embedding = Word_Embedding()
+        if args.embed_dim is not None:
+            print("word_Embedding_Path {} ".format(args.word_Embedding_Path))
+            path = args.word_Embedding_Path
+        print("loading word2vec vectors...")
+        word_vecs = word_embedding.load_my_vecs(path, text_field.vocab.itos, text_field.vocab.freqs, k=args.embed_dim)
+        print("word2vec loaded!")
+        print("num words already in word2vec: " + str(len(word_vecs)))
+        print("loading unknown word2vec and convert to list...")
+        print("loading unknown word by avg......")
+        # word_vecs = add_unknown_words_by_uniform(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+        word_vecs = word_embedding.add_unknown_words_by_avg(word_vecs, text_field.vocab.itos, k=args.embed_dim)
+        print("len(word_vecs) {} ".format(len(word_vecs)))
+        print("unknown word2vec loaded ! and converted to list...")
+
+    # update args and print
+    args.embed_num = len(text_field.vocab)
+    args.class_num = len(label_field.vocab) - 1
+
+    # load word2vec
+    if args.word_Embedding:
+        args.pretrained_weight = word_vecs
+
+    # print parameters
+    print("\nParameters:")
+    file = open("Parameters.txt", "a")
+    for attr, value in sorted(args.__dict__.items()):
+        if attr.upper() != "PRETRAINED_WEIGHT" and attr.upper() != "pretrained_weight_static".upper():
+            print("\t{}={}".format(attr.upper(), value))
+        file.write("\t{}={}\n".format(attr.upper(), value))
     file.close()
-    file = open("./Test_Result.txt", "a")
-    file.write("\nThe Best Result is : " + str(result[len(result) - 1]))
-    file.write("\n")
-    file.close()
-    shutil.copy("./Test_Result.txt", "./snapshot/" + mulu + "/Test_Result.txt")
+    # shutil.copy("./Parameters.txt", "./snapshot/" + mulu + "/Parameters.txt")
+    shutil.copy("./Parameters.txt", "./snapshot/" + mulu)
+    shutil.copy("./hyperparams.py", "./snapshot/" + mulu)
+
+    # model
+    if args.CNN is True:
+        print("loading CNN model.....")
+        model = model_CNN.CNN_Text(args)
+        # save model in this time
+        shutil.copy("./models/model_CNN.py", "./snapshot/" + mulu)
+    elif args.BiLSTM_1 is True:
+        print("loading BiLSTM_1 model.....")
+        model = model_BiLSTM_1.BiLSTM_1(args)
+        # save model in this time
+        shutil.copy("./models/model_BiLSTM_1.py", "./snapshot/" + mulu)
+    elif args.SRU is True:
+        print("loading SRU model.....")
+        model = model_SRU.SRU(args)
+        # save model in this time
+        shutil.copy("./models/model_SRU.py", "./snapshot/" + mulu)
+    elif args.BiSRU is True:
+        print("loading  model.....")
+        model = model_BiSRU.BiSRU(args)
+        # save model in this time
+        shutil.copy("./models/model_BiSRU.py", "./snapshot/" + mulu)
+    # del args.kernel_sizes
+    if args.cuda is True:
+        print("using cuda......")
+        model = model.cuda()
+    print(model)
+
+    if args.CNN is True:
+        print("CNN training start......")
+        model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.BiLSTM_1 is True:
+        print("BiLSTM_1 training start......")
+        model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.SRU is True:
+        print("SRU training start......")
+        model_count = train_ALL_SRU.train(train_iter, dev_iter, test_iter, model, args)
+    elif args.BiSRU is True:
+        print("BiSRU training start......")
+        model_count = train_ALL_SRU.train(train_iter, dev_iter, test_iter, model, args)
+    print("Model_count", model_count)
+
+    # calculate the best result
+    cv_result.append(calculate_result())
+print(cv_result)
+cv_mean = cal_mean(cv_result)
+print("The best result is {:.6f} ".format(cv_mean))
+

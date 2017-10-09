@@ -18,15 +18,15 @@ Subj = False
 
 # cv
 CV = True
-nfold = 10
+nfold = 5
 
 learning_rate = 0.001
 learning_rate_decay = 0.9   # value is 1 means not change lr
 # learning_rate_decay = 1   # value is 1 means not change lr
-epochs = 500
+epochs = 1
 batch_size = 16
 log_interval = 1
-test_interval = 100
+test_interval = 10000
 save_interval = 100
 save_dir = "snapshot"
 shuffle = True
@@ -37,8 +37,8 @@ dropout_embed = 0.6
 max_norm = None
 clip_max_norm = 5
 kernel_num = 200
-kernel_sizes = "1,2,3,4"
-# kernel_sizes = "5"
+# kernel_sizes = "1,2,3,4"
+kernel_sizes = "5"
 static = False
 # model
 CNN = True
@@ -56,7 +56,7 @@ wide_conv = True
 min_freq = 1
 # word_Embedding
 word_Embedding = False
-embed_dim = 300
+embed_dim = 10
 # word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 word_Embedding_Path = "./word2vec/glove.840B.300d.handled.Twitter.txt"
 # word_Embedding_Path = "./word.txt"
