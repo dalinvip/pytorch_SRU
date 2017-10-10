@@ -12,8 +12,8 @@ Subj_path = "./data/Subj"
 
 # select which data
 Twitter = False
-MR = True
-CR = False
+MR = False
+CR = True
 Subj = False
 
 # cv
@@ -58,8 +58,19 @@ min_freq = 1
 word_Embedding = False
 embed_dim = 10
 # word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
-word_Embedding_Path = "./word2vec/glove.840B.300d.handled.Twitter.txt"
-# word_Embedding_Path = "./word.txt"
+# word_Embedding_Path = "./word2vec/glove.840B.300d.handled.Twitter.txt"
+if Twitter is True:
+    word_Embedding_Path = "./word2vec/converted_word_Twitter.txt"
+elif MR is True:
+    word_Embedding_Path = "./word2vec/converted_word_MR.txt"
+elif CR is True:
+    word_Embedding_Path = "./word2vec/converted_word_CR.txt"
+elif Subj is True:
+    word_Embedding_Path = "./word2vec/converted_word_Subj.txt"
+else:
+    print("word_Embedding_Path is None")
+print(word_Embedding_Path)
+
 lstm_hidden_dim = 300
 lstm_num_layers = 5
 device = -1
