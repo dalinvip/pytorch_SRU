@@ -56,6 +56,7 @@ wide_conv = True
 min_freq = 1
 # word_Embedding
 word_Embedding = False
+fix_Embedding = False
 embed_dim = 10
 # word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 # word_Embedding_Path = "./word2vec/glove.840B.300d.handled.Twitter.txt"

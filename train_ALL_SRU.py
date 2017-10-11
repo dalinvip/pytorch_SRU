@@ -11,20 +11,30 @@ import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
+
 def train(train_iter, dev_iter, test_iter, model, args):
     if args.cuda:
         model = model.cuda()
 
     if args.Adam is True:
         print("Adam Training......")
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
+        if args.fix_Embedding is True:
+            optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+        else:
+            optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
     elif args.SGD is True:
         print("SGD Training.......")
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay,
+        if args.fix_Embedding is True:
+            optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+        else:
+            optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay,
                                     momentum=args.momentum_value)
     elif args.Adadelta is True:
         print("Adadelta Training.......")
-        optimizer = torch.optim.Adadelta(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
+        if args.fix_Embedding is True:
+            optimizer = torch.optim.Adadelta(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+        else:
+            optimizer = torch.optim.Adadelta(model.parameters(), lr=args.lr, weight_decay=args.init_weight_decay)
 
     '''
         lambda1 = lambda epoch: epoch // 30

@@ -82,6 +82,7 @@ parser.add_argument('-BiLSTM_1', action='store_true', default=hyperparams.BiLSTM
 parser.add_argument('-SRU', action='store_true', default=hyperparams.SRU, help='whether to use SRU model')
 parser.add_argument('-BiSRU', action='store_true', default=hyperparams.BiSRU, help='whether to use BiSRU model')
 parser.add_argument('-wide_conv', action='store_true', default=hyperparams.wide_conv, help='whether to use wide conv')
+parser.add_argument('-fix_Embedding', action='store_true', default=hyperparams.fix_Embedding, help='whether to fix word embedding during training')
 parser.add_argument('-word_Embedding', action='store_true', default=hyperparams.word_Embedding, help='whether to load word embedding')
 parser.add_argument('-word_Embedding_Path', type=str, default=hyperparams.word_Embedding_Path, help='filename of model snapshot [default: None]')
 parser.add_argument('-lstm-hidden-dim', type=int, default=hyperparams.lstm_hidden_dim, help='the number of embedding dimension in LSTM hidden layer')

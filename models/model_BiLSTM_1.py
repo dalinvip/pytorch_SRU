@@ -27,6 +27,9 @@ class BiLSTM_1(nn.Module):
         else:
             print("max_norm = {} |||||".format(args.max_norm))
             self.embed = nn.Embedding(V, D, scale_grad_by_freq=True)
+        if args.fix_Embedding is True:
+            self.embed.weight.requires_grad = False
+        # self.embed.weight.requires_grad = False
         if args.word_Embedding:
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
