@@ -11,9 +11,9 @@ CR_path = "./data/CR"
 Subj_path = "./data/Subj"
 
 # select which data
-Twitter = False
+Twitter = True
 MR = False
-CR = True
+CR = False
 Subj = False
 
 # cv
@@ -41,10 +41,11 @@ kernel_num = 200
 kernel_sizes = "5"
 static = False
 # model
-CNN = True
+CNN = False
 BiLSTM_1 = False
 SRU = False
 BiSRU = False
+SRU_Formula = True
 # select optim algorhtim to train
 Adam = True
 SGD = False
@@ -57,7 +58,7 @@ min_freq = 1
 # word_Embedding
 word_Embedding = False
 fix_Embedding = False
-embed_dim = 10
+embed_dim = 100
 # word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 # word_Embedding_Path = "./word2vec/glove.840B.300d.handled.Twitter.txt"
 if Twitter is True:

@@ -51,6 +51,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
             target.data.sub_(1)  # batch first, index align
             if args.cuda:
                 feature, target = feature.cuda(), target.cuda()
+            # print(feature)
 
             # target = autograd.Variable(target)  # question 1
             optimizer.zero_grad()
