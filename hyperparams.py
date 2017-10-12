@@ -26,8 +26,8 @@ learning_rate_decay = 0.9   # value is 1 means not change lr
 epochs = 1
 batch_size = 16
 log_interval = 1
-test_interval = 10000
-save_interval = 100
+test_interval = 10
+save_interval = 10
 save_dir = "snapshot"
 shuffle = True
 epochs_shuffle = True
@@ -58,7 +58,7 @@ min_freq = 1
 # word_Embedding
 word_Embedding = False
 fix_Embedding = False
-embed_dim = 100
+embed_dim = 300
 # word_Embedding_Path = "./word2vec/glove.sentiment.conj.pretrained.txt"
 # word_Embedding_Path = "./word2vec/glove.840B.300d.handled.Twitter.txt"
 if Twitter is True:
@@ -73,7 +73,7 @@ else:
     print("word_Embedding_Path is None")
 print(word_Embedding_Path)
 
-lstm_hidden_dim = 300
+lstm_hidden_dim = 200
 lstm_num_layers = 5
 device = -1
 no_cuda = False

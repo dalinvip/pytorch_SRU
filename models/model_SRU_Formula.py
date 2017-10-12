@@ -11,8 +11,10 @@ random.seed(hyperparams.seed_num)
 
 
 class SRU_Formula_Cell(nn.Module):
-    def __init__(self, n_in, n_out, dropout=0.0, bias=True):
+    def __init__(self, args, n_in, n_out, layer_numbers=1, dropout=0.0, bias=True):
         super(SRU_Formula_Cell, self).__init__()
+        self.args = args
+        self.layer_numbers = layer_numbers
         self.n_in = n_in
         self.n_out = n_out
         self.dropout = dropout
@@ -22,6 +24,7 @@ class SRU_Formula_Cell(nn.Module):
         self.rt = nn.Linear(self.n_in, self.n_out, bias=bias)
         # self.convert_x = nn.Linear(self.n_in, self.n_out, bias=True)
         self.convert_x = self.init_Linear(self.n_in, self.n_out, bias=True)
+        self.convert_x_layer = self.init_Linear(self.n_out, self.args.embed_dim, bias=True)
         self.convert_dim = self.init_Linear(self.n_in, self.n_out, bias=True)
         # dropout
         self.dropout = nn.Dropout(dropout)
@@ -32,53 +35,52 @@ class SRU_Formula_Cell(nn.Module):
 
     def init_Linear(self, in_fea, out_fea, bias=True):
         linear = nn.Linear(in_features=in_fea, out_features=out_fea, bias=bias)
-        return linear
+        if self.args.cuda is True:
+            return linear.cuda()
+        else:
+            return linear
 
     def forward(self, xt, ct_forward):
         # print(xt.size())
         # print(ct_forward.size())
         # print("////////////////")
-        layer = ct_forward.size(0)
+        # layer = ct_forward.size(0)
+        layer = self.layer_numbers
         for layers in range(layer):
             # print("aaa", xt.size())
+            # print("sas", self.n_out, self.n_in)
             if xt.size(2) == self.n_out:
-                self.convert_dim = SRU_Formula_Cell.init_Linear(self, in_fea=xt.size(2), out_fea=self.n_in)
-                xt = self.convert_dim(xt)
-            xt, ct = SRU_Formula_Cell.calculate_one_layer(self, xt, ct_forward[layers], layers)
-        # for i in range(xt.size(0)):
-        #     print("***************")
-        #     print(xt[i].size())
-        #     x_t = self.x_t(xt[i])
-        #     ft = F.sigmoid(self.ft(xt[i]))
-        #     rt = F.sigmoid(self.rt(xt[i]))
-        #     print("x_t", x_t.size())
-        #     print("ft", ft.size())
-        #     print("rt", rt.size())
-        #     self.convert_dim = self.init_Linear(in_fea=ct_forward.size(0), out_fea=ft.size(0), bias=True)
-        #     ct_forward = self.convert_dim(ct_forward.permute(1, 2, 0))
-        #     # print("ct_con", ct_forward.size())
-        #     ct = torch.add(torch.mul(ft, ct_forward), torch.mul((1 - ft), x_t))
-        #     # print("ct", ct.size())
-        #     con_xt = self.convert_x(xt)
-        #     ht = torch.add(torch.mul(rt, F.tanh(ct)), torch.mul((1 - rt), con_xt))
-
+            #     self.convert_dim = SRU_Formula_Cell.init_Linear(self, in_fea=xt.size(2), out_fea=self.n_in)
+                xt = self.convert_x_layer(xt)
+            # xt = self.convert_x(xt)
+            xt, ct = SRU_Formula_Cell.calculate_one_layer(self, xt, ct_forward[layers])
         if self.dropout is not None:
             ht = self.dropout(xt)
             ct = self.dropout(ct)
-        return ht, ct
+        if self.args.cuda is True:
+            return ht.cuda(), ct.cuda()
+        else:
+            return ht, ct
 
-    def calculate_one_layer(self, xt, ct_forward, layer):
+    def calculate_one_layer(self, xt, ct_forward):
         # print(xt.size())
         # print(ct_forward.size())
         # init c
         ct = ct_forward
         ht_list = []
+        # if xt.size(2) == self.n_out:
+        #     print("aaa")
+        #     self.convert_dim = SRU_Formula_Cell.init_Linear(self, in_fea=xt.size(2), out_fea=self.n_in)
+        #     xt = self.convert_dim(xt)
         for i in range(xt.size(0)):
             # print("***************")
             # print(xt[i].size())
             # print(layer)
             x_t = self.x_t(xt[i])
-            ft = F.sigmoid(self.ft(xt[i]))
+            if self.args.cuda is True:
+                ft = F.sigmoid(self.ft(xt[i]).cuda()).cuda()
+            else:
+                ft = F.sigmoid(self.ft(xt[i]))
             rt = F.sigmoid(self.rt(xt[i]))
             # print("x_t", x_t.size())
             # print("ft", ft.size())
@@ -97,11 +99,13 @@ class SRU_Formula_Cell(nn.Module):
         # for i in range(len(ht_list) - 1):
         ht = torch.cat(ht_list, 0)
         # print(ht.size())
-        if self.dropout is not None:
-            ht = self.dropout(ht)
-            ct = self.dropout(ct)
-        return ht, ct
-
+        # if self.dropout is not None:
+        #     ht = self.dropout(ht)
+        #     ct = self.dropout(ct)
+        if self.args.cuda is True:
+            return ht.cuda(), ct.cuda()
+        else:
+            return ht, ct
 
 
 class SRU_Formula(nn.Module):
@@ -110,6 +114,7 @@ class SRU_Formula(nn.Module):
         self.args = args
         self.hidden_dim = args.lstm_hidden_dim
         self.num_layers = args.lstm_num_layers
+        print("layers", self.num_layers)
         V = args.embed_num
         D = args.embed_dim
         C = args.class_num
@@ -122,8 +127,11 @@ class SRU_Formula(nn.Module):
             pretrained_weight = np.array(args.pretrained_weight)
             self.embed.weight.data.copy_(torch.from_numpy(pretrained_weight))
 
-        self.sru = SRU_Formula_Cell(n_in=D, n_out=self.hidden_dim, dropout=args.dropout, bias=True)
+        self.sru = SRU_Formula_Cell(self.args, n_in=D, n_out=self.hidden_dim, layer_numbers=self.num_layers,
+                                    dropout=args.dropout, bias=True)
         print(self.sru)
+        if self.args.cuda is True:
+            self.sru.cuda()
 
         # if args.init_weight:
         #     print("Initing W .......")
