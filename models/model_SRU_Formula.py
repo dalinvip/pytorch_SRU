@@ -44,7 +44,6 @@ class SRU_Formula_Cell(nn.Module):
         # print(xt.size())
         # print(ct_forward.size())
         # print("////////////////")
-        # layer = ct_forward.size(0)
         layer = self.layer_numbers
         for layers in range(layer):
             # print("aaa", xt.size())
