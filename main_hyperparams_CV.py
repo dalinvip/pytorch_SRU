@@ -127,7 +127,8 @@ def load_cv_data(text_field, label_field, path, **kargs):
 def create_Iterator(train_data, dev_data, test_data, batch_size, **kargs):
     train_iter, dev_iter, test_iter = data.Iterator.splits(
         (train_data, dev_data, test_data),
-        batch_sizes=(batch_size, len(dev_data), len(test_data)), **kargs)
+        # batch_sizes=(batch_size, len(dev_data), len(test_data)), **kargs)
+        batch_sizes=(batch_size, batch_size, batch_size), **kargs)
     return train_iter, dev_iter, test_iter
 
 

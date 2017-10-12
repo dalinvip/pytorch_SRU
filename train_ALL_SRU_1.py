@@ -59,7 +59,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
         for batch in train_iter:
             feature, target = batch.text, batch.label
             # feature.data.t_()
-            # feature = Variable(feature.data, volatile=False)
+            feature = Variable(feature.data, volatile=False)
             target.data.sub_(1)  # batch first, index align
             if args.cuda:
                 feature, target = feature.cuda(), target.cuda()
@@ -67,10 +67,10 @@ def train(train_iter, dev_iter, test_iter, model, args):
             # target = autograd.Variable(target)  # question 1
             optimizer.zero_grad()
             model.zero_grad()
-            model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
+            # model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
             if feature.size(1) != args.batch_size:
-                # continue
-                model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
+                continue
+                # model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
             logit = model(feature)
             loss = F.cross_entropy(logit, target)
             # print(loss)logit.size()
@@ -115,7 +115,7 @@ def eval(data_iter, model, args, scheduler):
         feature, target = batch.text, batch.label
         target.data.sub_(1)
 
-        # feature = Variable(feature.data, volatile=False)
+        feature = Variable(feature.data, volatile=False)
         # feature, target = batch.text, batch.label.data.sub_(1)
         if args.cuda is True:
             feature, target = feature.cuda(), target.cuda()
@@ -127,8 +127,8 @@ def eval(data_iter, model, args, scheduler):
         # model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
         if feature.size(1) != args.batch_size:
             # print("aaa")
-            # continue
-            model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
+            continue
+            # model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
         # scheduler.step(loss.data[0])
@@ -160,10 +160,10 @@ def test_eval(data_iter, model, save_path, args, model_count):
         # target.data.sub_(1)  # batch first, index align
         # target = autograd.Variable(target)
 
-        model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
+        # model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
         if feature.size(1) != args.batch_size:
-            # continue
-            model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
+            continue
+            # model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
 
