@@ -18,9 +18,9 @@
 ![](https://i.imgur.com/I7XCySI.jpg)  
 最后，我们把c传递给激活函数来计算最终的输出h:  
 ![](https://i.imgur.com/h86Ytp9.jpg)  
-以上就是SRU的几个经典实现，熟悉LSTM的人一定能够看出来，SRU与LSTM一样都是依赖于前一时刻的计算，这样的做法没有什么意义，接下来我们我们在对其进一步的改进。  
+以上就是SRU的经典实现，熟悉LSTM的人一定能够看出来，SRU与LSTM一样都是依赖于前一时刻的计算，这样的做法没有什么意义，接下来我们我们在对其进一步的改进。  
 
-**论文的实现中用到了两个格外的特征：**  
+**论文的实现中用到了两个附加的特征：**  
 
 - **Skip Connection**  
 具体来说，skip connection就是Highway Connection，对训练深层神经网络很有效果，我们来具体看一下公式：  
@@ -55,15 +55,12 @@
 
 
 ## References  ##
-[1] Tao Lei and Yu Zhang. Training RNNs as Fast as CNNs. arXiv:1709.02755, 2017.
-
-[2] Tao Lei and Yu Zhang. Training RNNs as Fast as CNNs. arXiv:1709.02755v2, 2017.
-
+[1] Tao Lei and Yu Zhang. Training RNNs as Fast as CNNs. arXiv:1709.02755, 2017.  
+[2] Tao Lei and Yu Zhang. Training RNNs as Fast as CNNs. arXiv:1709.02755v2, 2017.  
 [3] James Bradbury, Stephen Merity, Caiming Xiong, and Richard Socher. Quasi-recurrent neural
-networks. In ICLR, 2017.
-
+networks. In ICLR, 2017.  
 [4] Yarin Gal and Zoubin Ghahramani. A theoretically grounded application of dropout in recurrent
-neural networks. In Advances in Neural Information Processing Systems 29 (NIPS), 2016.
+neural networks. In Advances in Neural Information Processing Systems 29 (NIPS), 2016.  
+[5] Jeremy Appleyard, Tomas Kocisky, and Phil Blunsom. Optimizing performance of recurrent neural networks on gpus. arXiv preprint arXiv:1604.01946, 2016.  
 
-[5] Jeremy Appleyard, Tomas Kocisky, and Phil Blunsom. Optimizing performance of recurrent neural networks on gpus. arXiv preprint arXiv:1604.01946, 2016.
 
