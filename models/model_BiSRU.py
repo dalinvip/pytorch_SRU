@@ -5,7 +5,7 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-from models import cuda_functional as MF
+# from models import cuda_functional as MF
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
@@ -24,10 +24,10 @@ class BiSRU(nn.Module):
         self.dropout_embed = nn.Dropout(args.dropout_embed)
         if args.max_norm is not None:
             print("max_norm = {} ".format(args.max_norm))
-            self.embed = nn.Embedding(V, D, max_norm=args.max_norm)
+            self.embed = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
         else:
             print("max_norm = {} |||||".format(args.max_norm))
-            self.embed = nn.Embedding(V, D)
+            self.embed = nn.Embedding(V, D, scale_grad_by_freq=True)
         # self.embed = nn.Embedding(V, D)
         if args.fix_Embedding is True:
             self.embed.weight.requires_grad = False

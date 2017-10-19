@@ -11,23 +11,23 @@ CR_path = "./data/CR"
 Subj_path = "./data/Subj"
 
 # select which data
-Twitter = True
-MR = False
+Twitter = False
+MR = True
 CR = False
 Subj = False
 
 # cv
 CV = True
-nfold = 2
+nfold = 10
 
 learning_rate = 0.001
-learning_rate_decay = 0.9   # value is 1 means not change lr
-# learning_rate_decay = 1   # value is 1 means not change lr
+# learning_rate_decay = 0.9   # value is 1 means not change lr
+learning_rate_decay = 1   # value is 1 means not change lr
 epochs = 1
 batch_size = 16
 log_interval = 1
-test_interval = 10
-save_interval = 10
+test_interval = 100
+save_interval = 100
 save_dir = "snapshot"
 shuffle = True
 epochs_shuffle = True
@@ -37,12 +37,13 @@ dropout_embed = 0.6
 max_norm = None
 clip_max_norm = 5
 kernel_num = 200
-# kernel_sizes = "1,2,3,4"
-kernel_sizes = "5"
+kernel_sizes = "1,2,3,4"
+# kernel_sizes = "5"
 static = False
 # model
 CNN = False
-BiLSTM_1 = True
+LSTM = True
+BiLSTM_1 = False
 SRU = False
 BiSRU = False
 SRU_Formula = False
@@ -73,7 +74,7 @@ else:
     print("word_Embedding_Path is None")
 print(word_Embedding_Path)
 
-lstm_hidden_dim = 200
+lstm_hidden_dim = 300
 lstm_num_layers = 5
 device = -1
 no_cuda = False
@@ -82,7 +83,7 @@ num_threads = 1
 freq_1_unk = False
 # whether to init w
 init_weight = True
-init_weight_value = 2.0
+init_weight_value = 6.0
 # L2 weight_decay
 weight_decay = 1e-9   # default value is zero in Adam SGD
 # weight_decay = 0   # default value is zero in Adam SGD

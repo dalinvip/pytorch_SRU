@@ -12,6 +12,7 @@ import train_ALL_LSTM
 import train_ALL_SRU
 from models import model_CNN
 from models import model_BiLSTM_1
+from models import model_LSTM
 from models import model_SRU
 from models import model_BiSRU
 from models import model_SRU_Formula
@@ -80,6 +81,7 @@ parser.add_argument('-kernel-sizes', type=str, default=hyperparams.kernel_sizes,
 parser.add_argument('-static', action='store_true', default=hyperparams.static, help='fix the embedding')
 parser.add_argument('-CNN', action='store_true', default=hyperparams.CNN, help='whether to use CNN model')
 parser.add_argument('-BiLSTM_1', action='store_true', default=hyperparams.BiLSTM_1, help='whether to use BiLSTM_1 model')
+parser.add_argument('-LSTM', action='store_true', default=hyperparams.LSTM, help='whether to use LSTM model')
 parser.add_argument('-SRU', action='store_true', default=hyperparams.SRU, help='whether to use SRU model')
 parser.add_argument('-BiSRU', action='store_true', default=hyperparams.BiSRU, help='whether to use BiSRU model')
 parser.add_argument('-SRU_Formula', action='store_true', default=hyperparams.SRU_Formula, help='whether to use SRU_Formula model')
@@ -235,6 +237,11 @@ elif args.BiLSTM_1 is True:
     model = model_BiLSTM_1.BiLSTM_1(args)
     # save model in this time
     shutil.copy("./models/model_BiLSTM_1.py", "./snapshot/" + mulu)
+elif args.LSTM is True:
+    print("loading LSTM model.....")
+    model = model_LSTM.LSTM(args)
+    # save model in this time
+    shutil.copy("./models/model_LSTM.py", "./snapshot/" + mulu)
 elif args.SRU is True:
     print("loading SRU model.....")
     model = model_SRU.SRU(args)
@@ -274,6 +281,9 @@ if args.CNN is True:
     model_count = train_ALL_CNN.train(train_iter, dev_iter, test_iter, model, args)
 elif args.BiLSTM_1 is True:
     print("BiLSTM_1 training start......")
+    model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
+elif args.LSTM is True:
+    print("LSTM training start......")
     model_count = train_ALL_LSTM.train(train_iter, dev_iter, test_iter, model, args)
 elif args.SRU is True:
     print("SRU training start......")

@@ -22,7 +22,12 @@ class SRU(nn.Module):
         C = args.class_num
         self.dropout = nn.Dropout(args.dropout)
         self.dropout_embed = nn.Dropout(args.dropout_embed)
-        self.embed = nn.Embedding(V, D)
+        if args.max_norm is not None:
+            print("max_norm = {} ".format(args.max_norm))
+            self.embed = nn.Embedding(V, D, max_norm=args.max_norm, scale_grad_by_freq=True)
+        else:
+            print("max_norm = {} |||||".format(args.max_norm))
+            self.embed = nn.Embedding(V, D, scale_grad_by_freq=True)
         if args.fix_Embedding is True:
             self.embed.weight.requires_grad = False
         if args.word_Embedding:
