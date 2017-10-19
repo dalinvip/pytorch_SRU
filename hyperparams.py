@@ -42,10 +42,10 @@ kernel_sizes = "5"
 static = False
 # model
 CNN = False
-BiLSTM_1 = False
+BiLSTM_1 = True
 SRU = False
 BiSRU = False
-SRU_Formula = True
+SRU_Formula = False
 # select optim algorhtim to train
 Adam = True
 SGD = False

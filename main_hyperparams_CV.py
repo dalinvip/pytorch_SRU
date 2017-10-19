@@ -191,7 +191,7 @@ def cal_mean(list):
 text_field = data.Field(lower=True)
 label_field = data.Field(sequential=False)
 print("\nLoading data...")
-args.cuda = (args.no_cuda) and torch.cuda.is_available()
+args.cuda = args.no_cuda and torch.cuda.is_available()
 args.kernel_sizes = [int(k) for k in args.kernel_sizes.split(',')]
 # save file
 mulu = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
