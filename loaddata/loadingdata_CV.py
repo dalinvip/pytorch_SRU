@@ -96,6 +96,8 @@ class CV(data.Dataset):
             random.shuffle(examples_test)
         if dev_ratio > 0:
             dev_index = -1 * int(dev_ratio * len(examples_train))
+            # print("eee", len(examples_train))
+            # print("dex", dev_index)
 
         return (cls(text_field, label_field, examples=examples_train[:dev_index]),
                 cls(text_field, label_field, examples=examples_train[dev_index:]),

@@ -5,7 +5,7 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-# from models import cuda_functional as MF
+from models import cuda_functional as MF
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
@@ -61,11 +61,14 @@ class SRU(nn.Module):
         # x = embed.view(len(x), embed.size(1), -1)
         sru_out, self.hidden = self.sru(x)
 
+        # sru_out = sru_out[-1]
+        #
         sru_out = torch.transpose(sru_out, 0, 1)
         sru_out = torch.transpose(sru_out, 1, 2)
         sru_out = F.tanh(sru_out)
         sru_out = F.max_pool1d(sru_out, sru_out.size(2)).squeeze(2)
         sru_out = F.tanh(sru_out)
+        # sru_out = self.dropout(sru_out)
 
         logit = self.hidden2label(sru_out)
 

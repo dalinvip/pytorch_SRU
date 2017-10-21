@@ -5,7 +5,7 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-# from models import cuda_functional as MF
+from models import cuda_functional as MF
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
@@ -68,7 +68,7 @@ class BiSRU(nn.Module):
         bisru_out = F.tanh(bisru_out)
         bisru_out = F.max_pool1d(bisru_out, bisru_out.size(2)).squeeze(2)
         bisru_out = F.tanh(bisru_out)
-        bisru_out = self.dropout(bisru_out)
+        # bisru_out = self.dropout(bisru_out)
         logit = self.hidden2label(bisru_out)
 
         return logit

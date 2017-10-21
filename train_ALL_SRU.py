@@ -8,6 +8,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 import shutil
 import random
 import hyperparams
+import time
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
 
@@ -51,6 +52,7 @@ def train(train_iter, dev_iter, test_iter, model, args):
     steps = 0
     model_count = 0
     model.train()
+    time_list = []
     for epoch in range(1, args.epochs+1):
         print("\n## 第{} 轮迭代，共计迭代 {} 次 ！##\n".format(epoch, args.epochs))
         scheduler.step()
@@ -71,11 +73,20 @@ def train(train_iter, dev_iter, test_iter, model, args):
             if feature.size(1) != args.batch_size:
                 # continue
                 model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
+
+            # start_time = time.time()
             logit = model(feature)
+            # end_time = time.time()
+            # time_list.append(end_time - start_time)
+            # print("Forward Time is {} ".format(end_time - start_time))
             loss = F.cross_entropy(logit, target)
             # print(loss)logit.size()
             # loss.backward(retain_graph=True)
+            start_time = time.time()
             loss.backward()
+            end_time = time.time()
+            time_list.append(end_time - start_time)
+            print("Backward Time is {} ".format(end_time - start_time))
             if args.init_clip_max_norm is not None:
                 # print("aaaa {} ".format(args.init_clip_max_norm))
                 utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
@@ -105,6 +116,12 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 test_model = torch.load(save_path)
                 model_count += 1
                 test_eval(test_iter, test_model, save_path, args, model_count)
+        sum = 0
+        for index, value in enumerate(time_list):
+            if index != 0:
+                sum += value
+        avg = sum / len(time_list)
+        print("Time is {} ".format(avg))
     return model_count
 
 

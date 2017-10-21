@@ -20,6 +20,7 @@ import multiprocessing as mu
 import shutil
 import random
 import hyperparams
+import time
 # solve encoding
 from imp import reload
 import sys
@@ -270,11 +271,8 @@ torch.set_num_threads(args.num_threads)
 if os.path.exists("./Test_Result.txt"):
     os.remove("./Test_Result.txt")
 
-# for id in range(args.nfold):
-#     cv_spilit_file(data_path, args.nfold, test_id=id)
-#     train_iter, dev_iter, test_iter = load_data_twitter(data_path, text_field, label_field, device=args.device,
-#                                                         repeat=False, shuffle=args.epochs_shuffle)
-# cv_spilit_file(data_path, args.nfold, test_id=1)
+# calculate the time of demo
+start_time = time.time()
 
 if args.CNN is True:
     print("CNN training start......")
@@ -296,6 +294,9 @@ elif args.SRU_Formula is True:
     model_count = train_ALL_SRU.train(train_iter, dev_iter, test_iter, model, args)
 print("Model_count", model_count)
 
+# calculate the time of demo
+end_time = time.time()
+print("The demo Times is : ", end_time - start_time)
 resultlist = []
 if os.path.exists("./Test_Result.txt"):
     file = open("./Test_Result.txt")
