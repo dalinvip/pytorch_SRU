@@ -12,9 +12,9 @@ Subj_path = "./data/Subj"
 
 # select which data
 Twitter = False
-MR = True
+MR = False
 CR = False
-Subj = False
+Subj = True
 
 # cv
 CV = True

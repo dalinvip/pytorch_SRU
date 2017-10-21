@@ -41,10 +41,10 @@ class  CNN_Text(nn.Module):
             print("using wide convolution")
             if self.args.cuda is True:
                 self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1),
-                                         padding=(K//2, 0), dilation=1, bias=False).cuda() for K in Ks]
+                                         padding=(K//2, 0), dilation=1, bias=True).cuda() for K in Ks]
             else:
                 self.convs1 = [nn.Conv2d(in_channels=Ci, out_channels=Co, kernel_size=(K, D), stride=(1, 1),
-                                         padding=(K // 2, 0), dilation=1, bias=False) for K in Ks]
+                                         padding=(K // 2, 0), dilation=1, bias=True) for K in Ks]
         else:
             print("using narrow convolution")
             if self.args.cuda is True:

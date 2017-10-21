@@ -82,11 +82,11 @@ def train(train_iter, dev_iter, test_iter, model, args):
             loss = F.cross_entropy(logit, target)
             # print(loss)logit.size()
             # loss.backward(retain_graph=True)
-            start_time = time.time()
+            # start_time = time.time()
             loss.backward()
-            end_time = time.time()
-            time_list.append(end_time - start_time)
-            print("Backward Time is {} ".format(end_time - start_time))
+            # end_time = time.time()
+            # time_list.append(end_time - start_time)
+            # print("Backward Time is {} ".format(end_time - start_time))
             if args.init_clip_max_norm is not None:
                 # print("aaaa {} ".format(args.init_clip_max_norm))
                 utils.clip_grad_norm(model.parameters(), max_norm=args.init_clip_max_norm)
@@ -116,12 +116,12 @@ def train(train_iter, dev_iter, test_iter, model, args):
                 test_model = torch.load(save_path)
                 model_count += 1
                 test_eval(test_iter, test_model, save_path, args, model_count)
-        sum = 0
-        for index, value in enumerate(time_list):
-            if index != 0:
-                sum += value
-        avg = sum / len(time_list)
-        print("Time is {} ".format(avg))
+        # sum = 0
+        # for index, value in enumerate(time_list):
+        #     if index != 0:
+        #         sum += value
+        # avg = sum / len(time_list)
+        # print("Time is {} ".format(avg))
     return model_count
 
 
