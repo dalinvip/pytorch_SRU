@@ -4,11 +4,18 @@ SRU implement in pytorch（Training RNNs as Fast as CNNs） [https://arxiv.org/a
 ## Requirement
 * python 3
 * pytorch > 0.1
-* torchtext > 0.1
+* torchtext > 0.1（if version 0.2.0 is failed, try the 0.1.0）
 * numpy
 
-## Result
-update later ......
+## performance Test Result
+- The following is the acc in the four datasets(CR、MR、Subj、Twitter)
+- ![](https://i.imgur.com/raMPaTW.jpg)
+
+## Speed Test Result
+- The following is the test of speed among CNN、LSTM、SRU（author）
+- ![](https://i.imgur.com/vWhHe3G.jpg)
+ 
+- ![](https://i.imgur.com/IZkPNiE.jpg)
 
 ## How to use the folder or file
 
@@ -141,5 +148,10 @@ update later ......
 
 ## Reference 
 
-update later
+[1] Tao Lei and Yu Zhang. Training RNNs as Fast as CNNs. arXiv:1709.02755, 2017.  
+[2] James Bradbury, Stephen Merity, Caiming Xiong, and Richard Socher. Quasi-recurrent neural
+networks. In ICLR, 2017.  
+[3] Yarin Gal and Zoubin Ghahramani. A theoretically grounded application of dropout in recurrent
+neural networks. In Advances in Neural Information Processing Systems 29 (NIPS), 2016.  
+[4] Jeremy Appleyard, Tomas Kocisky, and Phil Blunsom. Optimizing performance of recurrent neural networks on gpus. arXiv preprint arXiv:1604.01946, 2016.  
 
