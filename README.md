@@ -12,7 +12,7 @@ SRU implement in pytorch（Training RNNs as Fast as CNNs） [https://arxiv.org/a
 - ![](https://i.imgur.com/raMPaTW.jpg)
 
 ## Speed Test Result
-- The following is the test of speed among CNN、LSTM、SRU（author）
+- The following is the test of speed among CNN、LSTM、SRU（author），The "SRU-1" means one layer of SRU.
 - ![](https://i.imgur.com/vWhHe3G.jpg)
  
 - ![](https://i.imgur.com/IZkPNiE.jpg)
