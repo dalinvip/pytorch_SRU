@@ -11,10 +11,10 @@ CR_path = "./data/CR"
 Subj_path = "./data/Subj"
 
 # select which data
-Twitter = False
+Twitter = True
 MR = False
 CR = False
-Subj = True
+Subj = False
 
 # cv
 CV = True
@@ -26,8 +26,8 @@ learning_rate_decay = 1   # value is 1 means not change lr
 epochs = 1
 batch_size = 16
 log_interval = 1
-test_interval = 100
-save_interval = 100
+test_interval = 10
+save_interval = 10
 save_dir = "snapshot"
 shuffle = True
 epochs_shuffle = True

@@ -5,7 +5,7 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-from models import cuda_functional as MF
+# from models import cuda_functional as MF
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
@@ -38,12 +38,6 @@ class SRU(nn.Module):
                           dropout=self.args.dropout, bidirectional=False)
         print(self.sru)
 
-        # if args.init_weight:
-        #     print("Initing W .......")
-        #     init.xavier_normal(self.sru.all_weights[0][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[0][1], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[1][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[1][1], gain=np.sqrt(args.init_weight_value))
         self.hidden2label = nn.Linear(self.hidden_dim, C)
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)
         print("self.hidden", self.hidden)

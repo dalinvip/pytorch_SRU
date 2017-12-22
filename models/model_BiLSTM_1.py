@@ -58,21 +58,13 @@ class BiLSTM_1(nn.Module):
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout_embed(x)
-        # x = x.view(len(x), x.size(1), -1)
-        # x = embed.view(len(x), embed.size(1), -1)
         bilstm_out, self.hidden = self.bilstm(x, self.hidden)
-        # print(bilstm_out.size())
-        # print(self.hidden)
 
         bilstm_out = torch.transpose(bilstm_out, 0, 1)
         bilstm_out = torch.transpose(bilstm_out, 1, 2)
         bilstm_out = F.tanh(bilstm_out)
         bilstm_out = F.max_pool1d(bilstm_out, bilstm_out.size(2)).squeeze(2)
         bilstm_out = F.tanh(bilstm_out)
-        # bilstm_out = self.dropout(bilstm_out)
-
-        # bilstm_out = self.hidden2label1(bilstm_out)
-        # logit = self.hidden2label2(F.tanh(bilstm_out))
 
         logit = self.hidden2label(bilstm_out)
 

@@ -169,7 +169,7 @@ if args.TWO_CLASS_TASK:
         print("loading Twitter data")
         data_path = args.Twitter_path
         train_iter, dev_iter, test_iter = load_data_twitter(data_path, text_field, label_field, device=args.device,
-                                                            repeat=False, shuffle=args.epochs_shuffle)
+                                                            repeat=False, shuffle=args.epochs_shuffle, sort=False)
     else:
         print("The dataset require CV, please execute the main_hyperparams_CV.py file")
         exit()

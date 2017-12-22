@@ -228,19 +228,19 @@ for id in range(args.nfold):
             data_path = args.MR_path + "/rt-polarity.all"
             cv_spilit_file(data_path, args.nfold, test_id=id)
             train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
-                                                           repeat=False, shuffle=args.epochs_shuffle)
+                                                           repeat=False, shuffle=args.epochs_shuffle, sort=False)
         elif args.CR is True:
             print("loading CR data")
             data_path = args.CR_path + "/custrev.all"
             cv_spilit_file(data_path, args.nfold, test_id=id)
             train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
-                                                           repeat=False, shuffle=args.epochs_shuffle)
+                                                           repeat=False, shuffle=args.epochs_shuffle, sort=False)
         elif args.Subj is True:
             print("loading Subj data")
             data_path = args.Subj_path + "/subj.all"
             cv_spilit_file(data_path, args.nfold, test_id=id)
             train_iter, dev_iter, test_iter = load_cv_data(text_field, label_field, path="./", device=args.device,
-                                                           repeat=False, shuffle=args.epochs_shuffle)
+                                                           repeat=False, shuffle=args.epochs_shuffle, sort=False)
 
         '''
         # handle external word embedding to file for convenience

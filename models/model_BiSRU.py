@@ -5,7 +5,7 @@ from torch.autograd import Variable
 import numpy as np
 import random
 import torch.nn.init as init
-from models import cuda_functional as MF
+# from models import cuda_functional as MF
 import hyperparams
 torch.manual_seed(hyperparams.seed_num)
 random.seed(hyperparams.seed_num)
@@ -40,12 +40,6 @@ class BiSRU(nn.Module):
         self.bisru = MF.SRU(input_size=D, hidden_size=self.hidden_dim, num_layers=self.num_layers,
                             dropout=self.args.dropout, bidirectional=True)
         print(self.bisru)
-        # if args.init_weight:
-        #     print("Initing W .......")
-        #     init.xavier_normal(self.bilstm.all_weights[0][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.bilstm.all_weights[0][1], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.bilstm.all_weights[1][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.bilstm.all_weights[1][1], gain=np.sqrt(args.init_weight_value))
         self.hidden2label = nn.Linear(self.hidden_dim * 2, C)
         self.hidden = self.init_hidden(self.num_layers, args.batch_size)
         print("self.hidden", self.hidden)
@@ -59,8 +53,6 @@ class BiSRU(nn.Module):
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout_embed(x)
-        # x = x.view(len(x), x.size(1), -1)
-        # x = embed.view(len(x), embed.size(1), -1)
         bisru_out, self.hidden = self.bisru(x)
 
         bisru_out = torch.transpose(bisru_out, 0, 1)
@@ -68,7 +60,6 @@ class BiSRU(nn.Module):
         bisru_out = F.tanh(bisru_out)
         bisru_out = F.max_pool1d(bisru_out, bisru_out.size(2)).squeeze(2)
         bisru_out = F.tanh(bisru_out)
-        # bisru_out = self.dropout(bisru_out)
         logit = self.hidden2label(bisru_out)
 
         return logit

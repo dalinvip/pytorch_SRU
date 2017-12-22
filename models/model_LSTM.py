@@ -58,21 +58,14 @@ class LSTM(nn.Module):
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout_embed(x)
-        # x = x.view(len(x), x.size(1), -1)
-        # x = embed.view(len(x), embed.size(1), -1)
+
         lstm_out, self.hidden = self.lstm(x, self.hidden)
-        # print(bilstm_out.size())
-        # print(self.hidden)
 
         lstm_out = torch.transpose(lstm_out, 0, 1)
         lstm_out = torch.transpose(lstm_out, 1, 2)
         lstm_out = F.tanh(lstm_out)
         lstm_out = F.max_pool1d(lstm_out, lstm_out.size(2)).squeeze(2)
         lstm_out = F.tanh(lstm_out)
-        # bilstm_out = self.dropout(bilstm_out)
-
-        # bilstm_out = self.hidden2label1(bilstm_out)
-        # logit = self.hidden2label2(F.tanh(bilstm_out))
 
         logit = self.hidden2label(lstm_out)
 

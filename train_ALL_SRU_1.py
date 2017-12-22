@@ -119,20 +119,10 @@ def eval(data_iter, model, args, scheduler):
         # feature, target = batch.text, batch.label.data.sub_(1)
         if args.cuda is True:
             feature, target = feature.cuda(), target.cuda()
-        # feature.data.t_(), target.data.sub_(1)  # batch first, index align
-        # feature.data.t_(),\
-        # target.data.sub_(1)  # batch first, index align
-        # target = autograd.Variable(target)
-
-        # model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
         if feature.size(1) != args.batch_size:
-            # print("aaa")
             continue
-            # model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
-        # scheduler.step(loss.data[0])
-
         avg_loss += loss.data[0]
         corrects += (torch.max(logit, 1)[1].view(target.size()).data == target.data).sum()
 
@@ -156,14 +146,8 @@ def test_eval(data_iter, model, save_path, args, model_count):
         feature = Variable(feature.data, volatile=False)
         if args.cuda:
             feature, target = feature.cuda(), target.cuda()
-        # feature.data.t_()
-        # target.data.sub_(1)  # batch first, index align
-        # target = autograd.Variable(target)
-
-        # model.hidden = model.init_hidden(args.lstm_num_layers, args.batch_size)
         if feature.size(1) != args.batch_size:
             continue
-            # model.hidden = model.init_hidden(args.lstm_num_layers, feature.size(1))
         logit = model(feature)
         loss = F.cross_entropy(logit, target, size_average=False)
 

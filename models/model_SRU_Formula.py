@@ -28,10 +28,7 @@ class SRU_Formula_Cell(nn.Module):
         self.convert_dim = self.init_Linear(self.n_in, self.n_out, bias=True)
         # dropout
         self.dropout = nn.Dropout(dropout)
-        # print(self.x_t)
-        # print(self.ft)
-        # print(self.rt)
-        # print(self.dropout)
+
 
     def init_Linear(self, in_fea, out_fea, bias=True):
         linear = nn.Linear(in_features=in_fea, out_features=out_fea, bias=bias)
@@ -41,15 +38,9 @@ class SRU_Formula_Cell(nn.Module):
             return linear
 
     def forward(self, xt, ct_forward):
-        # print(xt.size())
-        # print(ct_forward.size())
-        # print("////////////////")
         layer = self.layer_numbers
         for layers in range(layer):
-            # print("aaa", xt.size())
-            # print("sas", self.n_out, self.n_in)
             if xt.size(2) == self.n_out:
-            #     self.convert_dim = SRU_Formula_Cell.init_Linear(self, in_fea=xt.size(2), out_fea=self.n_in)
                 xt = self.convert_x_layer(xt)
             # xt = self.convert_x(xt)
             xt, ct = SRU_Formula_Cell.calculate_one_layer(self, xt, ct_forward[layers])
@@ -67,40 +58,19 @@ class SRU_Formula_Cell(nn.Module):
         # init c
         ct = ct_forward
         ht_list = []
-        # if xt.size(2) == self.n_out:
-        #     print("aaa")
-        #     self.convert_dim = SRU_Formula_Cell.init_Linear(self, in_fea=xt.size(2), out_fea=self.n_in)
-        #     xt = self.convert_dim(xt)
         for i in range(xt.size(0)):
-            # print("***************")
-            # print(xt[i].size())
-            # print(layer)
             x_t = self.x_t(xt[i])
             if self.args.cuda is True:
                 ft = F.sigmoid(self.ft(xt[i]).cuda()).cuda()
             else:
                 ft = F.sigmoid(self.ft(xt[i]))
             rt = F.sigmoid(self.rt(xt[i]))
-            # print("x_t", x_t.size())
-            # print("ft", ft.size())
-            # print("rt", rt.size())
             self.convert_dim = self.init_Linear(in_fea=ct_forward.size(0), out_fea=ft.size(0), bias=True)
-            # ct_forward = self.convert_dim(ct_forward.permute(1, 2, 0))
-            # print("ct_con", ct_forward.size())
             ct = torch.add(torch.mul(ft, ct), torch.mul((1 - ft), x_t))
-            # print("ct", ct.size())
             con_xt = self.convert_x(xt[i])
             ht = torch.add(torch.mul(rt, F.tanh(ct)), torch.mul((1 - rt), con_xt))
             ht_list.append(ht.unsqueeze(0))
-            # print(len(ht_list))
-            # print("ct", ct.size())
-            # print("ht", ht.size())
-        # for i in range(len(ht_list) - 1):
         ht = torch.cat(ht_list, 0)
-        # print(ht.size())
-        # if self.dropout is not None:
-        #     ht = self.dropout(ht)
-        #     ct = self.dropout(ct)
         if self.args.cuda is True:
             return ht.cuda(), ct.cuda()
         else:
@@ -132,19 +102,12 @@ class SRU_Formula(nn.Module):
         if self.args.cuda is True:
             self.sru.cuda()
 
-        # if args.init_weight:
-        #     print("Initing W .......")
-        #     init.xavier_normal(self.sru.all_weights[0][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[0][1], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[1][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[1][1], gain=np.sqrt(args.init_weight_value))
         if args.cuda is True:
             self.hidden2label = nn.Linear(self.hidden_dim, C).cuda()
             self.hidden = self.init_hidden(self.num_layers, args.batch_size).cuda()
         else:
             self.hidden2label = nn.Linear(self.hidden_dim, C)
             self.hidden = self.init_hidden(self.num_layers, args.batch_size)
-        # print("self.hidden", self.hidden)
 
     def init_hidden(self, num_layers, batch_size):
         # the first is the hidden h
@@ -165,13 +128,7 @@ class SRU_Formula(nn.Module):
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout_embed(x)
-        # x = x.view(len(x), x.size(1), -1)
-        # x = embed.view(len(x), embed.size(1), -1)
-        # print(x.size())
-        # self.hidden = SRU_Formula.init_hidden_c(self, x.size(0), x.size(1))
-        # print("for", self.hidden)
         sru_out, self.hidden = self.sru(x, self.hidden)
-        # print("after", self.hidden)
 
         sru_out = torch.transpose(sru_out, 0, 1)
         sru_out = torch.transpose(sru_out, 1, 2)

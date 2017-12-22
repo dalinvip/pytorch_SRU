@@ -28,10 +28,7 @@ class SRU_Formula_Cell(nn.Module):
         self.convert_dim = self.init_Linear(self.n_in, self.n_out, bias=True)
         # dropout
         self.dropout = nn.Dropout(dropout)
-        # print(self.x_t)
-        # print(self.ft)
-        # print(self.rt)
-        # print(self.dropout)
+
 
     def init_Linear(self, in_fea, out_fea, bias=True):
         linear = nn.Linear(in_features=in_fea, out_features=out_fea, bias=bias)
@@ -41,17 +38,10 @@ class SRU_Formula_Cell(nn.Module):
             return linear
 
     def forward(self, xt, ct_forward):
-        # print(xt.size())
-        # print(ct_forward.size())
-        # print("////////////////")
         layer = self.layer_numbers
         for layers in range(layer):
-            # print("aaa", xt.size())
-            # print("sas", self.n_out, self.n_in)
             if xt.size(2) == self.n_out:
-            #     self.convert_dim = SRU_Formula_Cell.init_Linear(self, in_fea=xt.size(2), out_fea=self.n_in)
                 xt = self.convert_x_layer(xt)
-            # xt = self.convert_x(xt)
             xt, ct = SRU_Formula_Cell.calculate_one_layer(self, xt, ct_forward[layers])
         if self.dropout is not None:
             ht = self.dropout(xt)
@@ -110,13 +100,6 @@ class SRU_Formula(nn.Module):
         print(self.sru)
         if self.args.cuda is True:
             self.sru.cuda()
-
-        # if args.init_weight:
-        #     print("Initing W .......")
-        #     init.xavier_normal(self.sru.all_weights[0][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[0][1], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[1][0], gain=np.sqrt(args.init_weight_value))
-        #     init.xavier_normal(self.sru.all_weights[1][1], gain=np.sqrt(args.init_weight_value))
         if args.cuda is True:
             self.hidden2label = nn.Linear(self.hidden_dim, C).cuda()
             self.hidden = self.init_hidden(self.num_layers, args.batch_size).cuda()
@@ -144,13 +127,7 @@ class SRU_Formula(nn.Module):
     def forward(self, x):
         x = self.embed(x)
         x = self.dropout_embed(x)
-        # x = x.view(len(x), x.size(1), -1)
-        # x = embed.view(len(x), embed.size(1), -1)
-        # print(x.size())
-        # self.hidden = SRU_Formula.init_hidden_c(self, x.size(0), x.size(1))
-        # print("for", self.hidden)
         sru_out, self.hidden = self.sru(x, self.hidden)
-        # print("after", self.hidden)
 
         sru_out = torch.transpose(sru_out, 0, 1)
         sru_out = torch.transpose(sru_out, 1, 2)
