@@ -1,5 +1,7 @@
 ## Introduction
-SRU implement in pytorch（Training RNNs as Fast as CNNs） [https://arxiv.org/abs/1709.02755](https://arxiv.org/abs/1709.02755)
+SRU implement in pytorch（Training RNNs as Fast as CNNs） [https://arxiv.org/abs/1709.02755](https://arxiv.org/abs/1709.02755)  
+
+SRU summary is here([Simple Recurrent Unit(SRU](https://bamtercelboo.github.io/2017/10/19/SRU-Summary/))).
 
 ## Requirement
 * python 3
